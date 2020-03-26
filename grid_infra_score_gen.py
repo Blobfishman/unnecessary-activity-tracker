@@ -35,17 +35,17 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
 
 #Main method of generator
 def main():
-    if len(sys.argv) != 4:
+    if len(args) != 4:
         print("missing arguments. Usage:")
         print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp")
         return
 
     start_time = time.time()
 
-    print("Loading Grid Shape File at " + sys.argv[1])
+    print("Loading Grid Shape File at " + args[1])
 
     try:
-        grid = gpd.read_file(sys.argv[1])
+        grid = gpd.read_file(args[1])
         minx, miny, maxx, maxy = grid.geometry.total_bounds
         rnd = 4
         bb = str(round(miny,rnd)) + "," + str(round(minx,rnd)) + "," + str(round(maxy,rnd)) + "," + str(round(maxx,rnd))
@@ -61,9 +61,9 @@ def main():
         print("Grid shape file could not be located or is in the wrong format. Do you also have the .shx and .dbf files in the same directory?. Aborting..")
         return
 
-    print("Loading Tagweights at " + sys.argv[2])
+    print("Loading Tagweights at " + args[2])
     try:
-        df=pd.read_csv(sys.argv[2], sep=':',header=0)
+        df=pd.read_csv(args[2], sep=':',header=0)
     except:
         print("Tagweights file could not be located. Aborting..")
         return
@@ -285,10 +285,11 @@ def main():
 
     print("Generated grid:")
     print(dfgridnew)
-    dfgridnew.to_file(driver="ESRI Shapefile", filename=sys.argv[3])
-    print("Saved grid to file: " + sys.argv[3])
+    dfgridnew.to_file(driver="ESRI Shapefile", filename=args[3])
+    print("Saved grid to file: " + args[3])
     print("Finished")
     print("--- "+ str(round((time.time() - start_time), 2)) + " seconds ---")
     return
 
-main()
+if __name__ == "__main__":
+    main(sys.argv)
