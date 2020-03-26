@@ -34,7 +34,7 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
     file.flush()
 
 #Main method of generator
-def main():
+def main(args):
     if len(args) != 4:
         print("missing arguments. Usage:")
         print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp")
