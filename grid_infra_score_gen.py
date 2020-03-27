@@ -35,10 +35,22 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
 
 #Main method of generator
 def main(args):
-    if len(args) != 4:
-        print("missing arguments. Usage:")
-        print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp")
+    if not (len(args) == 4 or len(args) == 5):
+        print("Missing arguments. Usage:")
+        print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR_RADIUS)")
+        print("(BLUR RADIUS) is optional.")
         return
+    if len(args) == 5:
+        try:
+            blur_radius = float(args[4])
+        except:
+            print("Wrong last argument. Input a blur radius as an integer! Usage: ")
+            print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR RADIUS)")
+            print("(BLUR RADIUS) is optional.")
+            return
+        if blur_radius <= 0 or blur_radius >= 1:
+            print("Blur radius should be between 0 and 1. Aborting..")
+            return
 
     start_time = time.time()
 
@@ -79,7 +91,7 @@ def main(args):
     dict = {}
     print("Collecting dict: ")
     n_cols = len(df.columns)-3
-    for i in range(0,len(df.values)):
+    for i in range(0,len(df.values)-59):
         for x in range(2, n_cols+2):
             string = str(df.values[i][x])
             if not string == "nan":
@@ -241,6 +253,56 @@ def main(args):
     # finalgrid = grid.merge(polypivot, how='left', on="id")
     # #print(finalgrid)
     # insc_ways = np.array(finalgrid["infra_score"])
+
+    #BLUR
+    if len(args) == 5:
+
+        # Get Grid width and height
+        N = len(dfgridnew["geometry"])
+        #TODO: Width und Height Findung richtig implementieren
+
+        # Die Lösung hier funktioniert nicht, da die Gridrechtecke da neben-
+        # einanderliegende Kästchen in x-richtung andere y-Werte haben(wegen
+        # Erdkrümmung)
+        # _, miny, _, _ = dfgridnew["geometry"][0].bounds
+        # width = 1
+        # print(miny)
+        # for i in range(1, N):
+        #
+        #     #print(dfgridnew["geometry"][i].exterior.coords[0][1])
+        #     _, y, _, _ = dfgridnew["geometry"][i].bounds
+        #     print(i, y, miny == round(miny,4) == np.round(y,4))
+        #     if miny == y:
+        #         width+=1
+
+        # height = np.floor(N/weight)
+
+        # Die Lösung hier ist sehr WIP und im Allgemeinen falsch
+        #, da nicht alle grids quadratisch sind, aber in unserem Fall funtkioniert
+        # sie
+        width = int(np.floor(np.sqrt(N)))
+        height= int( np.ceil(np.sqrt(N)))
+
+        # Mögliche Lösungen:
+        # I  : Der user gibt width und height an
+        # II : Es gibt einen intelligenteren Weg width und height herauszufinden
+        # III: Es gibt einen intelligenteren Weg zu bluren
+
+        print("Found grid: (width:", width ,"height:", height,")")
+        new_infra = np.array(dfgridnew["infra_score"])
+        print("Bluring the grid with blur radius", blur_radius)
+        for i in progressbar(range(N)):
+            blur_val = dfgridnew["infra_score"][i]*blur_radius
+            new_infra[j+1] +=  blur_val
+            new_infra[j-1] +=  blur_val
+            new_infra[j+width] +=  blur_val
+            new_infra[j-width] +=  blur_val
+
+        #apply blur
+        dfgridnew["infra_score"] = new_infra
+
+
+
     insc = - np.array(dfgridnew["infra_score"])
     #print(insc_nodes)
     ct = 0

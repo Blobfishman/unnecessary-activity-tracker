@@ -11,7 +11,7 @@ You'll need Python3.x and the following modules:
 _overpy, numpy, pandas, geopandas, rtree_
 You can install them using pip or anaconda!
 
-## Generating the Infrastructure
+## Generating the Infrastructure.
 A Shape File of the grid(the _.shp, .dbf, .shx_ files), and a Table with tagweights.
 (You could also use a single _.geojson_ files in all commands instead of _.shp_ files)
 
@@ -21,6 +21,8 @@ python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp
 ```
 Keep in mind that this generates 5 filetypes: _.cpg, .dbf, .prj, .shp, .shx_
 If you set this Tool up on a server, you might consider running this very rarely, because the infra_score won't change much over time.
+
+(You can run this command with an optional `blur_radius`(between 0 and 1) at the end. This will blur the out coming infrastructure values to more realistically simulate the movement of persons between tiles. Keep in mind that this feature is work in progress, and only works on grids, that have the same width as height.)
 
 
 ## Generating the Shape File
@@ -38,7 +40,7 @@ This generates 5 filetypes(_.cpg, .dbf, .prj, .shp, .shx_) for the Shape file wi
 By specifying a different file extension for the output file to _.geojson_, a .geojson with the given data ready to display with web-frontend APIs(e. g. Leaflet, OpenLayers)
 
 
-## No files? We have example data
+## No files? We have example data!
 We ran the analysis for Heidelberg, Germany.
 You can use the grid and point files found in `data-samples`.
 
