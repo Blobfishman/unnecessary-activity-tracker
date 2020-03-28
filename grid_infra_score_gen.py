@@ -91,7 +91,7 @@ def main(args):
     dict = {}
     print("Collecting dict: ")
     n_cols = len(df.columns)-3
-    for i in range(0,len(df.values)-59):
+    for i in range(0,len(df.values)):
         for x in range(2, n_cols+2):
             string = str(df.values[i][x])
             if not string == "nan":
