@@ -22,7 +22,7 @@ python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp
 Keep in mind that this generates 5 filetypes: _.cpg, .dbf, .prj, .shp, .shx_
 If you set this Tool up on a server, you might consider running this very rarely, because the infra_score won't change much over time.
 
-(You can run this command with an optional `blur_radius`(between 0 and 1) at the end. This will blur the out coming infrastructure values to more realistically simulate the movement of persons between tiles. Keep in mind that this feature is work in progress, and only works on grids, that have the same width as height.)
+(You can run this command with optional arguments `blur_radius`(between 0 and 1), `grid_width` and `grid height`(each >= 1, numbers of cells in each direction) at the end. This will blur the out coming infrastructure values to more realistically simulate the movement of persons between tiles. Keep in mind that this feature is work in progress!)
 
 
 ## Generating the Shape File

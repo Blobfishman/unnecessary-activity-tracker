@@ -35,21 +35,34 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
 
 #Main method of generator
 def main(args):
-    if not (len(args) == 4 or len(args) == 5):
+    if not (len(args) == 4 or len(args) == 7):
         print("Missing arguments. Usage:")
-        print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR_RADIUS)")
-        print("(BLUR RADIUS) is optional.")
+        print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR_RADIUS GRID_WIDTH GRID_HEIGHT)")
+        print("(BLUR RADIUS GRID_WIDTH GRID_HEIGHT) is optional, if you want to blur the outcoming infrastructure values over the grid.")
         return
-    if len(args) == 5:
+    if len(args) == 7:
         try:
             blur_radius = float(args[4])
         except:
-            print("Wrong last argument. Input a blur radius as an integer! Usage: ")
-            print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR RADIUS)")
-            print("(BLUR RADIUS) is optional.")
+            print("Invalid blur radius. Input a float! Usage: ")
+            print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR_RADIUS GRID_WIDTH GRID_HEIGHT)")
+            print("(BLUR RADIUS GRID_WIDTH GRID_HEIGHT) is optional, if you want to blur the outcoming infrastructure values over the grid.")
             return
+        try:
+            grid_width = int(args[5])
+            grid_height = int(args[6])
+        except:
+            print("Invalid grid dimensions GRID_WIDTH and GRID_HEIGHT. Input Integers! Usage:")
+            print("python3 grid_infra_score_gen.py GRID.shp TAG_WEIGHTS.csv INFRA_SCORES.shp (BLUR_RADIUS GRID_WIDTH GRID_HEIGHT)")
+            print("(BLUR RADIUS GRID_WIDTH GRID_HEIGHT) is optional, if you want to blur the outcoming infrastructure values over the grid.")
+            return
+
         if blur_radius <= 0 or blur_radius >= 1:
             print("Blur radius should be between 0 and 1. Aborting..")
+            return
+
+        if grid_width <= 1 or grid_height <= 1:
+            print("Grid dimensions should be greater than 1. Aborting..")
             return
 
     start_time = time.time()
@@ -71,6 +84,12 @@ def main(args):
             pass
     except:
         print("Grid shape file could not be located or is in the wrong format. Do you also have the .shx and .dbf files in the same directory?. Aborting..")
+        return
+
+    if not grid_width*grid_height==len(grid['geometry']):
+        print("Given grid dimensons do not match given grid file.")
+        print(str(grid_width)+"*"+str(grid_height)+"="+str(grid_width*grid_height)+"≠"+str(len(grid["geometry"])))
+        print("Aborting..")
         return
 
     print("Loading Tagweights at " + args[2])
@@ -280,14 +299,17 @@ def main(args):
         # Die Lösung hier ist sehr WIP und im Allgemeinen falsch
         #, da nicht alle grids quadratisch sind, aber in unserem Fall funtkioniert
         # sie
-        width = int(np.floor(np.sqrt(N)))
-        height= int( np.ceil(np.sqrt(N)))
+        #width = int(np.floor(np.sqrt(N)))
+        #height= int( np.ceil(np.sqrt(N)))
 
         # Mögliche Lösungen:
         # I  : Der user gibt width und height an
         # II : Es gibt einen intelligenteren Weg width und height herauszufinden
         # III: Es gibt einen intelligenteren Weg zu bluren
 
+        # Lösung I
+        width = grid_width
+        height = grid_height
         print("Found grid: (width:", width ,"height:", height,")")
         new_infra = np.array(dfgridnew["infra_score"])
         print("Bluring the grid with blur radius", blur_radius)
